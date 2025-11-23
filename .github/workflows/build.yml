@@ -6,19 +6,43 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check out code
-        uses: actions/checkout@v2
+      - uses: actions/checkout@v2
 
-      # यह "मैजिक एक्शन" है जो अपने आप सारी सेटिंग्स (Java, Python, NDK) कर लेता है
-      - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+      # 1. Java 11 (Kivy के लिए बेस्ट)
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          command: buildozer android debug
-          buildozer_version: stable
+          distribution: 'temurin'
+          java-version: '11'
 
+      # 2. Python 3.8
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.8'
+
+      # 3. सारे जरूरी सिस्टम टूल्स (एक साथ)
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip libncurses5 libstdc++6 zlib1g
+
+      # 4. असली सुधार: सीधा GitHub से ताज़ा Buildozer और P4A इनस्टॉल करना
+      - name: Install Bleeding Edge Buildozer
+        run: |
+          pip install --upgrade pip
+          pip install cython==0.29.33
+          pip install git+https://github.com/kivy/buildozer.git@master
+          pip install git+https://github.com/kivy/python-for-android.git@master
+
+      # 5. APK बनाना
+      - name: Build APK
+        run: |
+          yes | buildozer android debug
+
+      # 6. APK अपलोड करना
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: Cyber-Launcher-APK
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/*.apk
