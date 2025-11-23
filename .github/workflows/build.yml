@@ -21,26 +21,32 @@ jobs:
         with:
           python-version: '3.8'
 
-      # 3. जरूरी टूल्स (इसमें से libncurses5 हटा दिया गया है)
+      # 3. जरूरी टूल्स (नए उबंटू के हिसाब से फिक्स किए हुए)
       - name: Install System Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip libncurses-dev libstdc++6 zlib1g
 
-      # 4. Buildozer और P4A (Master Branch से - ताकि AAB वाली दिक्कत न आए)
-      - name: Install Bleeding Edge Buildozer
+      # 4. Buildozer इनस्टॉल करना (Master Branch)
+      - name: Install Buildozer
         run: |
           pip install --upgrade pip
           pip install cython==0.29.33
           pip install git+https://github.com/kivy/buildozer.git@master
           pip install git+https://github.com/kivy/python-for-android.git@master
 
-      # 5. APK बनाना
+      # 5. [IMP] आपकी buildozer.spec फ़ाइल को ऑटोमैटिक ठीक करना
+      - name: Fix Buildozer Spec
+        run: |
+          sed -i 's/p4a.branch = stable/p4a.branch = master/' buildozer.spec
+          sed -i 's/#p4a.branch = master/p4a.branch = master/' buildozer.spec
+
+      # 6. APK बनाना
       - name: Build APK
         run: |
           yes | buildozer android debug
 
-      # 6. APK अपलोड करना
+      # 7. APK अपलोड करना
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
