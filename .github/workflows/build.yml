@@ -8,14 +8,14 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # 1. Java 11 (यह Android बनाने के लिए सबसे बेस्ट है)
+      # 1. Java 11
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '11'
 
-      # 2. Python 3.8 (सबसे स्टेबल वर्जन)
+      # 2. Python 3.8
       - name: Setup Python
         uses: actions/setup-python@v4
         with:
@@ -27,11 +27,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip
 
-      # 4. Buildozer इनस्टॉल करना
+      # 4. Buildozer (फिक्स किया हुआ वर्जन 1.5.0)
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
-          pip install buildozer cython==0.29.33
+          pip install buildozer==1.5.0 cython==0.29.33
 
       # 5. APK बनाना
       - name: Build APK
