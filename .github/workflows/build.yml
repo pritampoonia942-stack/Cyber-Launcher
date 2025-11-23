@@ -3,17 +3,17 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04  # <-- सबसे बड़ा बदलाव: स्टेबल OS
 
     steps:
       - uses: actions/checkout@v2
 
-      # 1. Java 11
+      # 1. Java 17 (नए Android बिल्ड्स के लिए जरूरी)
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
-          java-version: '11'
+          java-version: '17'
 
       # 2. Python 3.8
       - name: Setup Python
@@ -21,13 +21,13 @@ jobs:
         with:
           python-version: '3.8'
 
-      # 3. जरूरी टूल्स
+      # 3. जरूरी सिस्टम टूल्स (Ubuntu 22.04 के लिए)
       - name: Install System Dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip libncurses-dev libstdc++6 zlib1g
+          sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip libncurses5-dev libncursesw5-dev libstdc++6 zlib1g libgl1-mesa-dev libgles2-mesa-dev
 
-      # 4. Buildozer इनस्टॉल करना
+      # 4. Buildozer और P4A (Master Version)
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
@@ -35,16 +35,16 @@ jobs:
           pip install git+https://github.com/kivy/buildozer.git@master
           pip install git+https://github.com/kivy/python-for-android.git@master
 
-      # 5. [IMP] सेटिंग्स ठीक करना और लॉग लेवल बढ़ाना
+      # 5. Spec फाइल को ऑटो-फिक्स करना
       - name: Fix Spec File
         run: |
           sed -i 's/p4a.branch = stable/p4a.branch = master/' buildozer.spec
           sed -i 's/log_level = 1/log_level = 2/' buildozer.spec
 
-      # 6. APK बनाना (Verbose Mode -v के साथ)
+      # 6. APK बनाना (बिना 'yes' के फंस सकता है, इसलिए yes रखेंगे लेकिन Java 17 इसे संभाल लेगा)
       - name: Build APK
         run: |
-          yes | buildozer -v android debug
+          yes | buildozer android debug
 
       # 7. APK अपलोड करना
       - name: Upload APK
