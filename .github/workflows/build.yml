@@ -3,22 +3,45 @@ on: [push]
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+
     steps:
       - uses: actions/checkout@v2
 
-      # यह रोबोट अपने आप APK बना देगा
-      - name: Build APK with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
+      # 1. Java सेट करना (सबसे जरूरी फिक्स)
+      - name: Setup Java
+        uses: actions/setup-java@v3
         with:
-          command: buildozer android debug
-          buildozer_version: master
+          distribution: 'temurin'
+          java-version: '17'
 
-      # APK अपलोड करना
+      # 2. Python सेट करना
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # 3. सभी जरूरी टूल्स डालना
+      - name: Install System Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip
+
+      # 4. Buildozer डालना
+      - name: Install Buildozer
+        run: |
+          pip install --upgrade pip
+          pip install buildozer cython==0.29.33
+
+      # 5. APK बनाना
+      - name: Build APK
+        run: |
+          yes | buildozer android debug
+
+      # 6. APK अपलोड करना
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: Cyber-Launcher-APK
+          name: Final-Cyber-Launcher
           path: bin/*.apk
           
