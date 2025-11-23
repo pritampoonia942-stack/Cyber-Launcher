@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # 1. Java 11
+      # 1. Java 11 (Android के लिए जरूरी)
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -21,13 +21,13 @@ jobs:
         with:
           python-version: '3.8'
 
-      # 3. जरूरी टूल्स
+      # 3. जरूरी टूल्स (Dependencies)
       - name: Install Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip
 
-      # 4. Buildozer (फिक्स किया हुआ वर्जन 1.5.0)
+      # 4. Buildozer (यही लाइन ठीक की गई है)
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
