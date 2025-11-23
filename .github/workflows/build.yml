@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      # 1. Java 11 (Android के लिए जरूरी)
+      # 1. Java 11
       - name: Setup Java
         uses: actions/setup-java@v3
         with:
@@ -21,19 +21,19 @@ jobs:
         with:
           python-version: '3.8'
 
-      # 3. जरूरी टूल्स (Dependencies)
+      # 3. जरूरी टूल्स
       - name: Install Dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y build-essential git ffmpeg libsdl2-dev libsdl2-image-dev libsdl2-mixer-dev libsdl2-ttf-dev libportmidi-dev libswscale-dev libavformat-dev libavcodec-dev zlib1g-dev libffi-dev libssl-dev autoconf libtool automake pkg-config cmake zip unzip
 
-      # 4. Buildozer (यही लाइन ठीक की गई है)
+      # 4. Buildozer (सबसे पुराना और पक्का वर्जन)
       - name: Install Buildozer
         run: |
           pip install --upgrade pip
-          pip install buildozer==1.5.0 cython==0.29.33
+          pip install buildozer==1.2.0 cython==0.29.21
 
-      # 5. APK बनाना
+      # 5. APK बनाना (yes कमांड के साथ)
       - name: Build APK
         run: |
           yes | buildozer android debug
@@ -44,4 +44,3 @@ jobs:
         with:
           name: Cyber-Launcher-APK
           path: bin/*.apk
-          
